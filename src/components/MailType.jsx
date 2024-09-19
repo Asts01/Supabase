@@ -34,7 +34,7 @@ const MailType = ({closeMailTypeModal}) => {
         >
           &times;
         </button>
-        {/* entire styling of modal-component goes here */}
+        {/* styling of modal-component --- >>> */}
         <div className="flex flex-col gap-5 ">
         <div className='flex-col flex gap-2'>
           <h2 className='mb-3'>Select Mail-Type : </h2>

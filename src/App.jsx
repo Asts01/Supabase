@@ -3,7 +3,6 @@ import SignUp from './pages/SignUpPage';
 import Login from './pages/LoginPage';
 import Home from './pages/Home';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'; // No need for BrowserRouter here
-import DateTime from './components/DateTime';
 
 // Define the routes
 const route = createBrowserRouter([

@@ -4,6 +4,9 @@ import { supabase } from '../client';
 import CardView from '../components/CardView';
 import ListView from '../components/ListView';
 import Filter from '../components/Filter';
+import { setAuthStatusToTrue } from '../slice/userSlice';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 //BUG- Current email and password to udega hi(on refresh kyonki-redux me saved tha) db se jo data aa rha h aa jayega 
 //CORRECTION- Local storage use krlo to save current user's email and name
@@ -12,10 +15,16 @@ function Home() {
   // const name = useSelector((state) => state.user.name);
   // const email = useSelector((state) => state.user.email);
   
+  const authStatusRedux=useSelector((state)=>state.user.isAuthenticated);
+
   //FETCH CURRENT USER'S {name} AND {email} from LOCAL-STORAGE instead of react to save the state
   const items = JSON.parse(localStorage.getItem('details'));
+  const authStatus=JSON.parse(localStorage.getItem('authStatus'))
+  // const dipatch=useDispatch();
   const name=items.name;
   const email=items.email;
+  const navigate=useNavigate();
+  const dispatch=useDispatch();
 
 
   const [existingData, setExistingData] = useState([]);
@@ -28,6 +37,7 @@ function Home() {
 
 
   async function createRecord() {
+
     try {
       const { data, error } = await supabase
         .from('users')
@@ -35,6 +45,7 @@ function Home() {
           name: name,
           email: email,
         });
+      
       
       if (error) {
         console.error('Error inserting user:', error);
@@ -69,15 +80,27 @@ function Home() {
     fetchTable();
   }
 
-
   useEffect(() => {
+    if(authStatusRedux===false)
+    {
+      navigate('/login');
+    }
     if (name && email) {
       createRecord();
+      
     }else{
       
     }
     fetchTable();
   }, [name, email]);
+
+  // const dispatch=useDispatch();
+  //user can only go back if loggedOut once
+  const onLogoutFun=()=>{
+    dispatch(setAuthStatusToTrue(false));
+    setFilterComponent(!filterComponent);
+    navigate('/login');
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 absolute ">
@@ -90,7 +113,7 @@ function Home() {
           Email Id: <span className="text-purple-600">{email}</span>
         </p>
       </div>
-      <div>
+      <div className='relative'>
 
         {!isCardView?
           (<button className='bg-slate-500 text-white rounded-md p-1 m-2' onClick={()=>setIsCardView(!isCardView)}>List-View</button>):
@@ -98,6 +121,7 @@ function Home() {
         }
         <input placeholder='search for name' className='bg-slate-300 p-1 rounded-md' type='search' val={searchVal} onChange={(e)=>setSearchVal(e.target.value)}></input>
         <button className='p-1 bg-slate-700 text-white rounded-lg m-2' onClick={()=>setFilterComponent(!filterComponent)}>Filter </button>
+        <button className='p-1 bg-slate-700 text-white rounded-lg m-2 absolute right-0' onClick={()=>onLogoutFun()}>LogOut </button>
       </div>
       
         {filterComponent?(<div>{<Filter/>}</div>):(<div></div>)}
