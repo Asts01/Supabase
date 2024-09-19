@@ -1,12 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { supabase } from '../client';
+import CardView from '../components/CardView';
+import ListView from '../components/ListView';
+import Filter from '../components/Filter';
+
+//BUG- Current email and password to udega hi(on refresh kyonki-redux me saved tha) db se jo data aa rha h aa jayega 
+//CORRECTION- Local storage use krlo to save current user's email and name
 
 function Home() {
-  const name = useSelector((state) => state.user.name);
-  const email = useSelector((state) => state.user.email);
+  // const name = useSelector((state) => state.user.name);
+  // const email = useSelector((state) => state.user.email);
+  
+  //FETCH CURRENT USER'S {name} AND {email} from LOCAL-STORAGE instead of react to save the state
+  const items = JSON.parse(localStorage.getItem('details'));
+  const name=items.name;
+  const email=items.email;
+
 
   const [existingData, setExistingData] = useState([]);
+
+  const [isCardView,setIsCardView]=useState(true);
+
+  const [searchVal,setSearchVal]=useState("");
+
+  const [filterComponent,setFilterComponent]=useState(false);
+
 
   async function createRecord() {
     try {
@@ -43,11 +62,21 @@ function Home() {
     }
   }
 
+  function fetchDetailsAgain(){
+    //update the current name and email from redux store on re-loading of the page !!
+    name=useSelector((state)=>state.name);
+    email=useSelector((state)=>state.email);
+    fetchTable();
+  }
+
+
   useEffect(() => {
     if (name && email) {
       createRecord();
-      fetchTable();
+    }else{
+      
     }
+    fetchTable();
   }, [name, email]);
 
   return (
@@ -61,26 +90,24 @@ function Home() {
           Email Id: <span className="text-purple-600">{email}</span>
         </p>
       </div>
+      <div>
+
+        {!isCardView?
+          (<button className='bg-slate-500 text-white rounded-md p-1 m-2' onClick={()=>setIsCardView(!isCardView)}>List-View</button>):
+          <button className='bg-slate-500 text-white rounded-md p-1 m-2' onClick={()=>setIsCardView(!isCardView)}>Card-View</button>
+        }
+        <input placeholder='search for name' className='bg-slate-300 p-1 rounded-md' type='search' val={searchVal} onChange={(e)=>setSearchVal(e.target.value)}></input>
+        <button className='p-1 bg-slate-700 text-white rounded-lg m-2' onClick={()=>setFilterComponent(!filterComponent)}>Filter </button>
+      </div>
+      
+        {filterComponent?(<div>{<Filter/>}</div>):(<div></div>)}
 
       {/* Display user data in responsive tiles */}
       <div className="p-6">
         <h2 className="text-center text-xl mb-5">OnBoarded Users Till Date </h2>
-        {existingData.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {existingData.map((user, index) => (
-              <div key={index} className="bg-slate-200 p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
-                <p className="text-gray-700 font-semibold text-lg mb-2">ID: {user.id}</p>
-                <p className="text-purple-600 font-bold text-xl">{user.name}</p>
-                <p className="text-gray-600 mb-2">{user.email}</p>
-                <p className="text-gray-500 text-sm">{new Date(user.created_at).toLocaleString()}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center text-gray-500">No users found.</p>
-        )}
+        {!isCardView?(<ListView existingData={existingData}  searchVal={searchVal} />):(<CardView existingData={existingData} searchVal={searchVal} />)}
       </div>
-      <div className='fixed bottom-0 bg-slate-300 w-full justify-center items-center text-black text-center'>
+      <div className='fixed bottom-0 bg-violet-400 text-white w-full justify-center items-center text-black text-center'>
         Only email and password should match for onBoarding the user ,userName could still vary
       </div>
     </div>
