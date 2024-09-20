@@ -3,6 +3,7 @@ import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux';
 
 async function onStart(){
+  //new user inserted in the db
     const name = useSelector((state) => state.user.name);
     const email = useSelector((state) => state.user.email);
     try {
@@ -25,7 +26,7 @@ async function onStart(){
     }
 } 
 
-function OnLogin() {
+function OnSignUp() {
 
     useEffect(()=>{
         onStart();
@@ -38,4 +39,4 @@ function OnLogin() {
   )
 }
 
-export default OnLogin
+export default OnSignUp

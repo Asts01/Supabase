@@ -12,14 +12,14 @@ import { useDispatch } from 'react-redux';
 //CORRECTION- Local storage use krlo to save current user's email and name
 
 function Home() {
-  // const name = useSelector((state) => state.user.name);
-  // const email = useSelector((state) => state.user.email);
   
   const authStatusRedux=useSelector((state)=>state.user.isAuthenticated);
 
   //FETCH CURRENT USER'S {name} AND {email} from LOCAL-STORAGE instead of react to save the state
   const items = JSON.parse(localStorage.getItem('details'));
-  const authStatus=JSON.parse(localStorage.getItem('authStatus'))
+  // const authStatus=JSON.parse(localStorage.getItem('authStatus'));
+  // const authStatusRedux=authStatus.isAuthenticated;
+  console.log(authStatusRedux);
   // const dipatch=useDispatch();
   const name=items.name;
   const email=items.email;
@@ -98,6 +98,8 @@ function Home() {
   //user can only go back if loggedOut once
   const onLogoutFun=()=>{
     dispatch(setAuthStatusToTrue(false));
+    // localStorage.removeItem('authStatus');
+    // localStorage.removeItem('details');
     setFilterComponent(!filterComponent);
     navigate('/login');
   }

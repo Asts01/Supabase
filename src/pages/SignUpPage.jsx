@@ -10,6 +10,7 @@ import FormInput from '../customComponents/FormInput';
 import SocialSignUpButton from '../customComponents/SocialSignUpButton';
 import FooterLink from '../customComponents/FooterLink';
 import '../App.css'
+import OnSignUp from '../hooks/OnSignUp';
 
 // Yup schema for validation
 const signUpSchema = Yup.object().shape({
@@ -44,10 +45,15 @@ function SignUp() {
         return;
       }
 
+      OnSignUp();
       dispatch(updateUser({ name: name, email: email }));
       setEmail("");
       setPassword("");
       setName("");
+      // After a successful sign-up
+      // localStorage.setItem('authStatus', JSON.stringify({ isAuthenticated: true }));
+      // localStorage.setItem('details', JSON.stringify({ name, email }));
+
       navigate('/home');
     } catch (e) {
       setSignUpError(e.message);

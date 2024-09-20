@@ -17,7 +17,8 @@ export const UserSlice = createSlice({
             //on adding authStatus to localStorage we still stay on home-screen on beeing refreshed
             //otherwise user details get erased and we are directed to home-screen
             localStorage.setItem('details', JSON.stringify({'name':state.name,'email':state.email}));
-            localStorage.setItem('authStatus', JSON.stringify({'isAuthenticated':false}));
+            //equivalent to isAuthenticated in redux
+            // localStorage.setItem('authStatus', JSON.stringify({'isAuthenticated':false}));
         },
         setMailType:(state,action)=>{
           // console.log("currentMailType",action.payload);
@@ -26,7 +27,7 @@ export const UserSlice = createSlice({
         },
         setAuthStatusToTrue:(state,action)=>{
           state.isAuthenticated=action.payload;
-          localStorage.setItem('authStatus', JSON.stringify({'isAuthenticated':true}));
+          // localStorage.setItem('authStatus', JSON.stringify({'isAuthenticated':action.payload}));
         },
     },
   })

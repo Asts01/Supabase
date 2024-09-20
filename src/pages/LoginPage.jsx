@@ -5,9 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '../slice/userSlice';
 import img from "../assets/img.png"
-import { NavLink } from 'react-router-dom';
 import FormInput from '../customComponents/FormInput';
-import SocialSignUpButton from '../customComponents/SocialSignUpButton';
 import FooterLink from '../customComponents/FooterLink';
 import '../App.css'
 import { setAuthStatusToTrue } from '../slice/userSlice';
@@ -29,9 +27,10 @@ function Login() {
   const dispatch = useDispatch();
   const authStatusRedux=useSelector((state)=>state.user.isAuthenticated);
   // console.log(authStatusRedux);
-  // const authStatusRedux = JSON.parse(localStorage.getItem('authStatus'));
+  // const authStatus=JSON.parse(localStorage.getItem('authStatus'));
+  // const authStatusRedux=authStatus.isAuthenticated;
+  console.log(authStatusRedux);
   
-
   //aage tabhi behjo user ko,if we have authStatus true and once loggedOut - it is set to false
   useEffect(()=>{
     if(authStatusRedux===true)
