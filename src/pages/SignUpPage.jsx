@@ -1,15 +1,17 @@
+
 import { useEffect, useState } from 'react';
 import { supabase } from '../client';
 import * as Yup from 'yup';
 import { NavLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch ,useSelector} from 'react-redux';
 import { updateUser } from '../slice/userSlice';
 import img from "../assets/img.png";
 import FormInput from '../customComponents/FormInput';
 import SocialSignUpButton from '../customComponents/SocialSignUpButton';
 import FooterLink from '../customComponents/FooterLink';
-import '../App.css'
+import '../App.css';
+import { setAuthStatusToTrue } from '../slice/userSlice';
 import OnSignUp from '../hooks/OnSignUp';
 
 // Yup schema for validation
@@ -20,52 +22,62 @@ const signUpSchema = Yup.object().shape({
 });
 
 function SignUp() {
+  let authStatusRedux=useSelector((state)=>state.user.isAuthenticated);
+  useEffect(()=>{
+    if(authStatusRedux===true)
+      {
+        navigate('/home');
+        OnSignUp();
+      }
+  },[authStatusRedux])
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [signUpError, setSignUpError] = useState("");
-
+  
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  // const authStatus = JSON.parse(localStorage.getItem('authStatus'));
 
   async function signUpNewUser() {
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: email,
         password: password,
-        options: {
-          emailRedirectTo: 'https://google.com',
-        },
       });
-
+      
       if (error) {
-        setSignUpError(error.message);
+        setSignUpError(error.message);  
         return;
       }
 
-      OnSignUp();
-      dispatch(updateUser({ name: name, email: email }));
-      setEmail("");
-      setPassword("");
-      setName("");
-      // After a successful sign-up
-      // localStorage.setItem('authStatus', JSON.stringify({ isAuthenticated: true }));
-      // localStorage.setItem('details', JSON.stringify({ name, email }));
-
-      navigate('/home');
+      if (data && data.user) {
+        // Only proceed if the user has been successfully authenticated
+        if (data.user.aud === 'authenticated') {
+          // Dispatch user data to Redux store
+          dispatch(updateUser({ name: name, email: email }));
+          console.log("fussss");
+          dispatch(setAuthStatusToTrue(true));
+          OnSignUp();
+          // Navigate to home page
+        } else {
+          setSignUpError("Sign-up failed: Unable to authenticate user.");
+        }
+      }
+      
     } catch (e) {
-      setSignUpError(e.message);
+      console.log(e);
+      setSignUpError(e.message || "Something went wrong during sign-up.");
     }
   }
 
   function handleSubmit(event) {
     event.preventDefault();
+
     signUpSchema.validate({ name, email, password }, { abortEarly: false })
       .then(() => {
         setErrors({});
-        signUpNewUser();
+        signUpNewUser();  
       })
       .catch((err) => {
         const validationErrors = {};

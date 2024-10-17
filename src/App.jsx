@@ -21,6 +21,10 @@ const route = createBrowserRouter([
   {
     path: "/login",
     element: <Login /> // Render the Login component at /login
+  },
+  {
+    path:'signup/home',
+    element:<Home/>
   }
 ]);
 

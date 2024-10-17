@@ -6,11 +6,10 @@ export const UserSlice = createSlice({
       name:'',
         email:'',
         mailType:'',
-        isAuthenticated:false,//for maintaining state in redux
+        isAuthenticated:false,//for maintaining logged-in-active-state in redux
     },
     reducers: {
         //update user on getting onBoarded
-        //same as 
         updateUser:(state,action)=>{
             state.name=action.payload.name;
             state.email=action.payload.email;
@@ -18,7 +17,7 @@ export const UserSlice = createSlice({
             //otherwise user details get erased and we are directed to home-screen
             localStorage.setItem('details', JSON.stringify({'name':state.name,'email':state.email}));
             //equivalent to isAuthenticated in redux
-            // localStorage.setItem('authStatus', JSON.stringify({'isAuthenticated':false}));
+            localStorage.setItem('authStatus', JSON.stringify({'isAuthenticated':false}));
         },
         setMailType:(state,action)=>{
           // console.log("currentMailType",action.payload);
@@ -27,12 +26,11 @@ export const UserSlice = createSlice({
         },
         setAuthStatusToTrue:(state,action)=>{
           state.isAuthenticated=action.payload;
-          // localStorage.setItem('authStatus', JSON.stringify({'isAuthenticated':action.payload}));
+          localStorage.setItem('authStatus', JSON.stringify({'isAuthenticated':action.payload}));
         },
     },
   })
-  
-  // Action creators are generated for each case reducer function
+
   export const { updateUser,setMailType,setAuthStatusToTrue} = UserSlice.actions
   
   export default UserSlice.reducer
